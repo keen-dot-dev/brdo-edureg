@@ -1,0 +1,95 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: keen
+      changes:
+        - createTable:
+            tableName: region
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            constraintName: uc_name
+            tableName: region
+            columnNames: name
+  - changeSet:
+      id: 2
+      author: keen
+      changes:
+        - createTable:
+            tableName: institution
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: edrpou
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: region_id
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: type
+                  type: varchar(64)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_active
+                  type: boolean
+                  defaultValue: true
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            constraintName: uc_edrpou
+            tableName: institution
+            columnNames: edrpou
+        - addForeignKeyConstraint:
+            constraintName: fk_institution_region_id
+            baseTableName: institution
+            baseColumnNames: region_id
+            referencedTableName: region
+            referencedColumnNames: id
+

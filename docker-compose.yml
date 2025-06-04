@@ -1,0 +1,55 @@
+services:
+  edureg-db:
+    image: mysql:8
+    container_name: edureg-db
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DB}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - edureg_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - edureg_data
+
+  edureg-api:
+    build: api
+    container_name: edureg-api
+    depends_on:
+      edureg-db:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://edureg-db:3306/${MYSQL_DB}
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+      SPRING_LIQUIBASE_ENABLED: true
+    networks:
+      - edureg_data
+      - edureg_api
+
+  edureg-ui:
+    build: ui
+    container_name: edureg-ui
+    depends_on:
+      - edureg-api
+    ports:
+      - "3000:80"
+    networks:
+      - edureg_api
+
+volumes:
+  edureg_data:
+
+networks:
+  edureg_data:
+  edureg_api:
+
