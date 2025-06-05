@@ -1,53 +1,29 @@
-import axios from "axios";
+import httpClient from "../lib/api/httpClient";
+import { SCHOOL_DEACTIVATE_PATH, SCHOOLS_CONTROLLER } from "../lib/constants";
 
-const ENDPOINT_URL = "http://localhost:8080/schools";
+import type { Institution } from "../types/entities/institution";
+import type { InstitutionsFilter } from "../types/filters/institutionsFilter";
+import type { CreateInstitutionRequest } from "../types/requests/createInstiturionRequest";
 
-export const INSTITUTION_TYPES = [ "SCHOOL", "GYMNASIUM", "LYCEUM" ];
-export type InstitutionType = typeof INSTITUTION_TYPES[number];
-
-export type Region = {
-    id: number;
-    name: string;
+export async function createInstitution(data: CreateInstitutionRequest): Promise<Institution> {
+    const res = await httpClient.post<Institution>(SCHOOLS_CONTROLLER, data);
+    return res.data;
 }
 
-export type Institution = {
-    id: number;
-    edrpou: number;
-    name: string;
-    region: Region;
-    type: InstitutionType;
-    isActive: boolean;
-}
-
-export type CreateInstitutionRequest = {
-    edrpou: number;
-    name: string;
-    region: string;
-    type: InstitutionType;
-}
-
-export async function createInstitution(request: CreateInstitutionRequest) {
-    axios.post(ENDPOINT_URL, request);
-}
-
-export async function getInstitutions(filters: {
-    regions?: string[];
-    types?: InstitutionType[];
-    activeStatus?: string;
-}): Promise<Institution[]> {
+export async function getInstitutions(filter: InstitutionsFilter): Promise<Institution[]> {
     const params = new URLSearchParams();
 
-    filters.regions?.forEach((name) => params.append("region", name));
-    filters.types?.forEach((type) => params.append("type", type));
-    if (filters.activeStatus !== undefined) {
-        params.append("isActive", String(filters.activeStatus));
+    filter.regions?.forEach((name) => params.append("region", name));
+    filter.types?.forEach((type) => params.append("type", type));
+    if (filter.activeStatus !== undefined) {
+        params.append("isActive", String(filter.activeStatus));
     }
 
-    const res = await axios.get<Institution[]>(ENDPOINT_URL, { params });
+    const res = await httpClient.get<Institution[]>(SCHOOLS_CONTROLLER, { params });
     return res.data;
 }
 
 export async function deactivateInstitution(id: number): Promise<Institution> {
-    const res = await axios.patch<Institution>(ENDPOINT_URL + "/" + id + "/deactivate");
+    const res = await httpClient.patch<Institution>(SCHOOLS_CONTROLLER + `/${id}` + SCHOOL_DEACTIVATE_PATH);
     return res.data;
 }

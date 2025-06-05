@@ -1,0 +1,11 @@
+{
+    "id": "ID",
+    "edrpou": "ЄДРПОУ",
+    "name": "Name",
+    "region": "Region",
+    "type": "Type",
+    "status": "Status",
+    "createdAt": "Created",
+    "updatedAt": "Modified",
+    "controls": "Controls"
+}
